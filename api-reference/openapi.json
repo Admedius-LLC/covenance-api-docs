@@ -8,65 +8,100 @@
     },
     "version": "1.0.0"
   },
-  "servers": [
-    {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
   "security": [
     {
-      "bearerAuth": []
+      "ApiKeyAuth": []
     }
   ],
   "paths": {
-    "/plants": {
+    "/card": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "description": "Get all of your cards",
         "parameters": [
           {
-            "name": "limit",
+            "name": "status",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "description": "Filter by status",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "enum": ["active", "paused", "inactive", "closed"]
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorts card by creation date or name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "description": "The direction to apply the sort filter by. Default ASC.",
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Cursor for pagination",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Plant"
+                    "$ref": "#/components/schemas/Card"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "nextCursor": {
+                        "description": "The cursor to use to retrieve the next page of data. If this is not sent, there is no more data to retrieve",
+                        "type": "string"
+                      },
+                      "count": {
+                        "description": "The number of items in the current page of data",
+                        "type": "number"
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "description": "Create a card",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "description": "Card to add to the store",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/CreateCardBody"
               }
             }
           },
@@ -74,132 +109,621 @@
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/Card"
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/card/{cardId}": {
+      "get": {
+        "description": "Get the details for a single card by ID",
         "parameters": [
           {
-            "name": "id",
+            "name": "cardId",
             "in": "path",
-            "description": "ID of plant to delete",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
+            }
+          },
+          {
+            "name": "include_pan",
+            "in": "query",
+            "description": "Include PAN in card details",
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"]
+            }
+          },
+          {
+            "name": "include_cvv",
+            "in": "query",
+            "description": "Include CVV in card details",
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"]
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/CardWithPANAndCVV"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
+      },
+      "patch": {
+        "description": "Update a card",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/UpdateCardBody"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Card"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/transaction": {
+      "get": {
+        "description": "Get all transactions",
+        "parameters": [
+          {
+            "name": "from_date",
+            "in": "query",
+            "description": "Unix timestamp in milliseconds. This will return all transactions that occurred on or after the date passed in",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "description": "Unix timestamp in milliseconds. This will return all transactions that occurred on or before the date passed in",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter transactions by detailed status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "canceled",
+                "failed",
+                "settled",
+                "declined",
+                "refund",
+                "reversed",
+                "returned",
+                "dispute"
+              ]
+            }
+          },
+          {
+            "name": "card_id",
+            "in": "query",
+            "description": "Filter transactions by card id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "A cursor string to fetch the next page of results",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTransactionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new card",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCardBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Card"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/transaction/{transactionId}": {
+      "get": {
+        "description": "Get the details for a single transaction by ID",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
     "schemas": {
-      "Plant": {
+      "Card": {
         "required": [
-          "name"
+          "id",
+          "last4",
+          "name",
+          "expiryMonth",
+          "expiryYear",
+          "status",
+          "createdAt"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
+          "id": {
+            "description": "Id of the card",
             "type": "string"
           },
-          "tag": {
-            "description": "Tag to specify the type",
+          "last4": {
+            "description": "Last 4 digits of the card number",
             "type": "string"
+          },
+          "name": {
+            "description": "Name of the card holder",
+            "type": "string"
+          },
+          "expiryMonth": {
+            "description": "Expiry month of the card",
+            "type": "string"
+          },
+          "expiryYear": {
+            "description": "Expiry year of the card",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of the card",
+            "type": "string",
+            "enum": ["active", "paused", "inactive", "closed"]
+          },
+          "createdAt": {
+            "description": "Creation date of the card",
+            "type": "string",
+            "format": "date-time"
+          },
+          "spendingConstraint": {
+            "$ref": "#/components/schemas/SpendingConstraint"
           }
         }
       },
-      "NewPlant": {
+      "CardWithPANAndCVV": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/Plant"
+            "$ref": "#/components/schemas/Card"
           },
           {
-            "required": [
-              "id"
-            ],
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "pan": {
+                "description": "Pan of the card",
+                "type": "string"
+              },
+              "cvv": {
+                "description": "CVV of the card",
+                "type": "string"
               }
             }
           }
         ]
       },
-      "Error": {
+      "Transaction": {
         "required": [
-          "error",
-          "message"
+          "id",
+          "date",
+          "description",
+          "amountCents",
+          "status",
+          "referenceNumber",
+          "authorizedAt",
+          "status",
+          "createdAt"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "description": "Identification of the transaction",
+            "type": "string"
+          },
+          "date": {
+            "description": "Date in UTC time when the transaction was posted",
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "description": "Description of the transaction",
+            "type": "string"
+          },
+          "merchantData": {
+            "description": "For card transactions, contains description of the transaction as reported by the merchant and merchant category code. For other transactions, this field is undefined",
+            "type": "object",
+            "properties": {
+              "description": {
+                "description": "The raw description provided by the merchant for the transaction",
+                "type": "string"
+              },
+              "categoryCode": {
+                "description": "The merchant's category code (MCC)",
+                "type": "string"
+              }
+            },
+            "required": ["description", "categoryCode"]
+          },
+          "amountCents": {
+            "description": "The amount of the transaction in cents in USD. If the transaction amount is negative, the transaction is a debit. If the transaction amount is positive, the transaction is a credit",
+            "type": "number"
+          },
+          "status": {
+            "description": "Status of the transaction",
+            "type": "string",
+            "enum": [
+              "pending",
+              "canceled",
+              "failed",
+              "settled",
+              "declined",
+              "refund",
+              "reversed",
+              "returned",
+              "dispute"
+            ]
+          },
+          "cardId": {
+            "description": "Identification of the card",
+            "type": "string"
+          },
+          "originalCurrency": {
+            "description": "Original currency of the transaction",
+            "type": "object",
+            "properties": {
+              "code": {
+                "description": "Currency code",
+                "type": "string"
+              },
+              "amountCents": {
+                "description": "Amount of the transaction in cents",
+                "type": "number"
+              },
+              "conversionRate": {
+                "description": "Conversion rate",
+                "type": "number"
+              }
+            }
+          },
+          "referenceNumber": {
+            "description": "The reference number provided by Visa for this transaction",
+            "type": "string"
+          },
+          "authorizedAt": {
+            "description": "UTC timestamp of when the transaction was authorized. Only exists for card transactions",
+            "type": "string",
+            "format": "date-time"
+          },
+          "declineReason": {
+            "description": "Decline reason of the transaction",
+            "type": "string"
+          }
+        }
+      },
+      "SpendingConstraint": {
+        "description": "Spending constraint of the card",
+        "type": "object",
+        "properties": {
+          "spendingRule": {
+            "type": "object",
+            "properties": {
+              "utilizationLimit": {
+                "type": "object",
+                "properties": {
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "limitAmount": {
+                    "type": "object",
+                    "properties": {
+                      "amountCents": {
+                        "type": "number"
+                      }
+                    },
+                    "required": ["amountCents"]
+                  },
+                  "preset": {
+                    "type": "string",
+                    "enum": [
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly",
+                      "collective"
+                    ]
+                  },
+                  "startDate": {
+                    "type": "string"
+                  }
+                },
+                "required": ["preset"]
+              },
+              "transactionSizeLimit": {
+                "type": "object",
+                "properties": {
+                  "minimum": {
+                    "type": "object",
+                    "properties": {
+                      "amountCents": {
+                        "type": "number"
+                      }
+                    },
+                    "required": ["amountCents"]
+                  },
+                  "maximum": {
+                    "type": "object",
+                    "properties": {
+                      "amountCents": {
+                        "type": "number"
+                      }
+                    },
+                    "required": ["amountCents"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateCardBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused", "inactive", "closed"]
+          },
+          "spendingConstraint": {
+            "$ref": "#/components/schemas/SpendingConstraint"
+          }
+        }
+      },
+      "CreateCardBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "spendingConstraint": {
+            "$ref": "#/components/schemas/SpendingConstraint"
+          }
+        },
+        "required": ["name"]
+      },
+      "GetTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "nextCursor": {
+                "description": "The cursor to use to retrieve the next page of data. If this is not sent, there is no more data to retrieve",
+                "type": "string"
+              },
+              "count": {
+                "description": "The number of items in the current page of data",
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "ErrorWithId": {
+        "required": ["id", "status", "code", "message"],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorWithNoId": {
+        "required": ["status", "code", "message"],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "required": ["error", "message"],
+        "type": "object",
+        "properties": {
           "error": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number"
           },
           "message": {
             "type": "string"
@@ -207,10 +731,46 @@
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    "responses": {
+      "400": {
+        "description": "Invalid Body/Query Parameters",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorWithNoId"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorWithNoId"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too many requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorWithNoId"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Unidentified Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorWithNoId"
+            }
+          }
+        }
       }
     }
   }
