@@ -1,0 +1,26 @@
+---
+title: Overview
+description: "Use a webhook to receive real-time transaction event notifications."
+---
+
+## Event Ordering
+
+Covenance cannot guarantee the sequential delivery of events as they occur, nor can it ensure they will be received only once. Most events are generally received in the order in which they occurred; however, events created in close proximity may be received out of order.
+
+## Webhook Retries
+
+If Covenance does not receive a response code of 204 from your server within 10 seconds, it will retry delivery up to 3 times.
+
+## Setup
+
+To begin receiving real-time event notifications via the webhook, create it on the dashboard.
+
+## Event Payload
+
+```json
+{
+  "entityId": "<string>",
+  "event": "<string>",
+  "eventId": "<string>"
+}
+```

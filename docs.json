@@ -28,6 +28,10 @@
           "api-reference/transaction/get",
           "api-reference/transaction/get-one"
         ]
+      },
+      {
+        "group": "Webhook",
+        "pages": ["webhook/overview"]
       }
     ]
   },
