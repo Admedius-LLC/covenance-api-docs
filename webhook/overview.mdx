@@ -5,7 +5,7 @@ description: "Use a webhook to receive real-time transaction event notifications
 
 ## Event Ordering
 
-Covenance cannot guarantee the sequential delivery of events as they occur, nor can it ensure they will be received only once. Most events are generally received in the order in which they occurred; however, events created in close proximity may be received out of order.
+Covenance cannot guarantee the sequential delivery of events as they occur, nor can it ensure they will be received only once.
 
 ## Webhook Retries
 
@@ -13,7 +13,10 @@ If Covenance does not receive a response code of 204 from your server within 10 
 
 ## Setup
 
-To begin receiving real-time event notifications via the webhook, create it on the dashboard.
+To begin receiving real-time event notifications of the transactions of a sub account via the webhook, register a webhook for a sub account on the dashboard. 
+
+Once you register a webhook for a sub account, you will receive a payload with the id of the transaction on the POST endpoint you specified when you created the webhook.
+A maximum of 10 webhooks can be created.
 
 ## Event Payload
 
