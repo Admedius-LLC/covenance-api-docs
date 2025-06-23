@@ -59,23 +59,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Card"
-                  },
-                  "metadata": {
-                    "type": "object",
-                    "properties": {
-                      "nextCursor": {
-                        "description": "The cursor to use to retrieve the next page of data. If this is not sent, there is no more data to retrieve",
-                        "type": "string"
-                      },
-                      "count": {
-                        "description": "The number of items in the current page of data",
-                        "type": "number"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/GetTransactionResponse"
                 }
               }
             }
@@ -393,6 +377,109 @@
           }
         }
       }
+    },
+    "/sub-account": {
+      "get": {
+        "description": "Get all sub accounts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSubAccountsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new sub account",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/sub-account/{subAccountId}": {
+      "get": {
+        "description": "Get the details for a single sub account by ID",
+        "parameters": [
+          {
+            "name": "subAccountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -634,6 +721,33 @@
           }
         }
       },
+      "SubAccount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "object",
+            "properties": {
+              "amountCents": {
+                "type": "number"
+              }
+            }
+          },
+          "spend": {
+            "type": "object",
+            "properties": {
+              "amountCents": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
       "UpdateCardBody": {
         "type": "object",
         "properties": {
@@ -668,6 +782,54 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "nextCursor": {
+                "description": "The cursor to use to retrieve the next page of data. If this is not sent, there is no more data to retrieve",
+                "type": "string"
+              },
+              "count": {
+                "description": "The number of items in the current page of data",
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "GetCardsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Card"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "nextCursor": {
+                "description": "The cursor to use to retrieve the next page of data. If this is not sent, there is no more data to retrieve",
+                "type": "string"
+              },
+              "count": {
+                "description": "The number of items in the current page of data",
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "GetSubAccountsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubAccount"
             }
           },
           "metadata": {

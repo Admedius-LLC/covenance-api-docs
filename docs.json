@@ -14,6 +14,14 @@
         "pages": ["introduction"]
       },
       {
+        "group": "Sub Account",
+        "pages": [
+          "api-reference/sub-account/get",
+          "api-reference/sub-account/get-one",
+          "api-reference/sub-account/create"
+        ]
+      },
+      {
         "group": "Card",
         "pages": [
           "api-reference/card/get",
