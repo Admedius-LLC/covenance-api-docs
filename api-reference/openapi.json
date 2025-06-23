@@ -19,6 +19,14 @@
         "description": "Get all of your cards",
         "parameters": [
           {
+            "name": "subAccountId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
             "name": "status",
             "in": "query",
             "description": "Filter by status",
@@ -283,43 +291,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetTransactionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "429": {
-            "$ref": "#/components/responses/429"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new card",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCardBody"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Card"
                 }
               }
             }
@@ -766,6 +737,9 @@
       "CreateCardBody": {
         "type": "object",
         "properties": {
+          "subAccountId": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
@@ -773,7 +747,7 @@
             "$ref": "#/components/schemas/SpendingConstraint"
           }
         },
-        "required": ["name"]
+        "required": ["name", "subAccountId"]
       },
       "GetTransactionResponse": {
         "type": "object",
