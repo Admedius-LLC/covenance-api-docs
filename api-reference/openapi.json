@@ -451,6 +451,45 @@
           }
         }
       }
+    },
+    "/card-products": {
+      "get": {
+        "description": "Get all card products",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCardProductsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -651,12 +690,7 @@
                   },
                   "preset": {
                     "type": "string",
-                    "enum": [
-                      "daily",
-                      "weekly",
-                      "monthly",
-                      "yearly"
-                    ]
+                    "enum": ["daily", "weekly", "monthly", "yearly"]
                   },
                   "startDate": {
                     "type": "string"
@@ -744,6 +778,9 @@
           },
           "spendingConstraint": {
             "$ref": "#/components/schemas/SpendingConstraint"
+          },
+          "cardProductId": {
+            "type": "string"
           }
         },
         "required": ["name", "subAccountId"]
@@ -803,6 +840,39 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SubAccount"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "nextCursor": {
+                "description": "The cursor to use to retrieve the next page of data. If this is not sent, there is no more data to retrieve",
+                "type": "string"
+              },
+              "count": {
+                "description": "The number of items in the current page of data",
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "GetCardProductsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "required": ["id", "prefix", "status"],
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "prefix": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
             }
           },
           "metadata": {

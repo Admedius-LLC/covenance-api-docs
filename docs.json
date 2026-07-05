@@ -27,7 +27,8 @@
           "api-reference/card/get",
           "api-reference/card/create",
           "api-reference/card/get-one",
-          "api-reference/card/update"
+          "api-reference/card/update",
+          "api-reference/card/get-card-products"
         ]
       },
       {
