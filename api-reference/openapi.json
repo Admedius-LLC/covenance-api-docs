@@ -690,7 +690,7 @@
                   },
                   "preset": {
                     "type": "string",
-                    "enum": ["daily", "weekly", "monthly", "yearly"]
+                    "enum": ["daily", "weekly", "monthly", "yearly", "collective"]
                   },
                   "startDate": {
                     "type": "string"
