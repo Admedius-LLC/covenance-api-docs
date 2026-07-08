@@ -233,6 +233,14 @@
         "description": "Get all transactions",
         "parameters": [
           {
+            "name": "subAccountId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
             "name": "from_date",
             "in": "query",
             "description": "Unix timestamp in milliseconds. This will return all transactions that occurred on or after the date passed in",
@@ -690,7 +698,13 @@
                   },
                   "preset": {
                     "type": "string",
-                    "enum": ["daily", "weekly", "monthly", "yearly", "collective"]
+                    "enum": [
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly",
+                      "collective"
+                    ]
                   },
                   "startDate": {
                     "type": "string"
